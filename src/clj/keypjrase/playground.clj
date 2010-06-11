@@ -11,7 +11,8 @@
 (ns keypjrase.playground
   (:require clojure.contrib.str-utils)
   (:require [keypjrase [parser :as parser] 
-                       [document :as document]] :reload)
+                       [document :as document]
+                       [instance :as instance]] :reload)
   (:use [keypjrase.util] :reload)
   (:gen-class)
   )
@@ -28,6 +29,7 @@
                (apply hash-map options))
         documents (parser/parse-input (opts :parser) input-data)
         stats (document/calculate-collection-stats documents)   
+        instances (instance/create-instances-w-docs documents stats)
         ]
     stats))
 

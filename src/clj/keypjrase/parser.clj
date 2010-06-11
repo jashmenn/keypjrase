@@ -19,7 +19,7 @@
 
 (defn extract-document-from-line [acc line]
  (let [parts (s/re-split #"\t" line)
-        tags (tokenize-str (first parts))
+        tags (set (tokenize-str (first parts)))
         body (tokenize-str (last parts))]
      (if (> (count parts) 1)  
          (cons (struct-map document :tags tags :body body) acc)

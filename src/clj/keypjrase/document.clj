@@ -1,5 +1,6 @@
 (ns keypjrase.document
   (:use [keypjrase.stemmer] :reload)
+  (:use [clojure.contrib.seq-utils :only [find-first indexed frequencies]])
   (:require clojure.contrib.str-utils))
 
 (defstruct document :url :body :tags)
@@ -28,14 +29,30 @@
        acc (keys (count-each-word-once (document :body)))))
     {} documents))
 
+(defn stem-all [all]
+  (reverse (reduce (fn [acc token] (cons (stem token) acc)) '() all)))
+
+(defn body-frequencies [document] 
+  (frequencies (stem-all (document :body))))
+
+(comment test-objects)
+
 (def test-documents
   [(struct-map document :body '("free" "money" "here" "dog")
-                        :tags '("free" "money"))
+                        :tags #{"free" "money"})
    (struct-map document :body '("horse" "likes" "eat" "carrots")
-                        :tags '("horse" "carrot"))
+                        :tags #{"horse" "carrot"})
    (struct-map document :body '("dog" "fleas" "still" "dog" "even" 
                                "though" "go" "flea" "market" "ya"), 
-                        :tags '("dog" "flea"))])
+                        :tags #{"dog" "flea"})])
+
+(def test-document (last test-documents))
+
+(def test-stats
+  (struct-map collection-stats :df {"flea" 1, "carrot" 1, "go" 1, "still" 1,
+    "ya" 1, "hor" 1, "free" 1, "monei" 1, "here" 1, "like" 1, "eat" 1, "even" 1,
+    "though" 1, "market" 1, "dog" 2}
+    :num-documents 3))
 
 (comment
 
