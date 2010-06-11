@@ -45,6 +45,9 @@
 (defn stem-global-phrase-count [unstemmed-phrase stats]
   (global-phrase-count (stem unstemmed-phrase) stats))
 
+(defn document-length [document]
+  (count (document :body)))
+
 (comment test-objects)
 
 (def test-documents
