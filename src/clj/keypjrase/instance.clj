@@ -51,9 +51,10 @@
 (def dataset-fields 
    [{:is_keyword [:true :false]} :tfidf :distance])
 
-(defn to-instance-vec [instance]
-  [(keyword (str (instance :class))) ((instance :features) :tfidf) 
-                     ((instance :features) :distance)])
+(defn to-instance-vec [instance] ; todo grab features dynamically from dataset-fields
+  [(keyword (str (instance :class))) 
+    ((instance :features) :tfidf) 
+    ((instance :features) :distance)])
 
 (def test-instances (create-instances-w-docs d/test-documents d/test-stats))
 
