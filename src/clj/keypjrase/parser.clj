@@ -1,6 +1,7 @@
 (ns keypjrase.parser
   (:require [clojure.contrib [str-utils :as s]]) 
   (:use [keypjrase.document] :reload)
+  (:require [keypjrase [document :as d]] :reload)
   (:import [java.io BufferedReader FileReader]) 
   )
 
@@ -19,7 +20,7 @@
 
 (defn extract-document-from-line [acc line]
  (let [parts (s/re-split #"\t" line)
-        tags (set (tokenize-str (first parts)))
+        tags (set (d/stem-all (tokenize-str (first parts)))) ; stemming? argh!
         body (tokenize-str (last parts))]
      (if (> (count parts) 1)  
          (cons (struct-map document :tags tags :body body) acc)

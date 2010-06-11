@@ -48,6 +48,18 @@
 (defn document-length [document]
   (count (document :body)))
 
+(defn first-occurrences
+  "given document returns a map with the key being the word and
+  the value is the the index of the first occurrence" 
+  [document]
+  (let [tokens (document :body)]
+  (into {} (map 
+             (fn [v] [(v 1) (/ (+ (v 0) 1) (count tokens))])
+             (clojure.contrib.seq-utils/indexed (distinct (stem-all tokens)))))))
+
+(defn is-tag? [tag document]
+  (contains? (document :tags) tag))
+
 (comment test-objects)
 
 (def test-documents
@@ -61,6 +73,7 @@
 
 (def test-document (last test-documents))
 (def test-frequencies (body-frequencies test-document))
+(def test-first-occur (first-occurrences test-document))
 
 (def test-stats
   (struct-map collection-stats :df {"flea" 1, "carrot" 1, "go" 1, "still" 1,

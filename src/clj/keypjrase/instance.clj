@@ -1,5 +1,6 @@
 (ns keypjrase.instance
   (:require [clojure.contrib [str-utils :as s]]) 
+  (:use [keypjrase.stemmer] :reload)
   (:use [clojure.contrib.seq-utils :only [find-first indexed frequencies]])
   (:use [clojure.contrib.generic.math-functions :only [log]])
   (:require [keypjrase [document :as d]] :reload))
@@ -12,25 +13,36 @@
 (defn tf-idf
   [phrase document local-counts stats]
   (let [local-val (local-counts phrase)
-        global-val (let [g (or (d/stem-global-phrase-count phrase stats) 0)]
+        global-val (let [g (or (d/global-phrase-count phrase stats) 0)]
                      (if (and (> g 0) *training?*) (- g 1) g))
         length (d/document-length document)
         tf (/ local-val length)
         idf (- (log (/ (+ global-val 1) (+ (stats :num-documents) 1))))]
   (* tf idf)))
-(calculate-phrase-features "flea" d/test-document d/test-frequencies d/test-stats)
+
 
 (defn calculate-phrase-features
-  [phrase document local-counts stats] 
-  (let [tfidf (tf-idf phrase document local-counts stats)]
-  tfidf))
+  "this function has so many parameters because we need to calculate many
+  features on the whole document. it is much more efficient to calculate them
+  once than to calculate them for each phrase"
+  [phrase document local-counts first-occur stats] 
+  (let [stem-phrase (stem phrase)
+        tfidf (tf-idf stem-phrase document local-counts stats)
+        first-oc (first-occur stem-phrase)
+        klass (d/is-tag? stem-phrase document) ; stemmed?
+        features (struct-map features :distance first-oc :tfidf tfidf)
+        instance (struct-map instance :token phrase :class klass
+                                      :features features)]
+  instance))
 
 (defn calculate-document-instances
   [document stats]
-  (let [document-counts (d/body-frequencies document)]
+  (let [local-counts (d/body-frequencies document)
+        first-occur (d/first-occurrences document)]
   (map #(apply calculate-phrase-features 
-               [% document local-counts stats])
+               [% document local-counts first-occur stats])
   (d/potential-phrases document))))
+(calculate-document-instances d/test-document d/test-stats)
 
 (defn create-instances-w-docs
   "given documents"
@@ -43,9 +55,14 @@
 
 (comment
 
+   (.printStackTrace *e)
+
   (create-instances-w-docs d/test-documents d/test-stats)
 
   (calculate-features d/test-document d/test-stats true)
+
+  (calculate-phrase-features "flea" d/test-document d/test-frequencies 
+                           d/test-first-occur d/test-stats)
 
 
   )
