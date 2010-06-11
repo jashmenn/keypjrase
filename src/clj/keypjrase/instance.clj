@@ -46,14 +46,22 @@
   "given documents"
   [documents stats]
   (flatten (map #(apply calculate-document-instances [% stats]) documents)))
-(create-instances-w-docs d/test-documents d/test-stats)
+
+
+(def dataset-fields 
+   [{:is_keyword [:true :false]} :tfidf :distance])
+
+(defn to-instance-vec [instance]
+  [(keyword (str (instance :class))) ((instance :features) :tfidf) 
+                     ((instance :features) :distance)])
+
+(def test-instances (create-instances-w-docs d/test-documents d/test-stats))
 
 (comment
 
    (.printStackTrace *e)
 
   (create-instances-w-docs d/test-documents d/test-stats)
-
   (calculate-document-instances d/test-document d/test-stats)
 
   (calculate-phrase-features "flea" d/test-document d/test-frequencies 
