@@ -14,7 +14,7 @@
   (struct-map collection-stats :df docfreq :num-documents num-docs)))
 
 (defn count-each-word-once [coll]
- (reduce #(merge-with + %1 {(stem %2) 1}) {} coll)) ; ew, stemming twice
+ (reduce #(merge-with + %1 {(stem %2) 1}) {} coll)) ; ew, stemming twice?
 
 (defn df 
   "given documents returns a map where the key is the token and the value is

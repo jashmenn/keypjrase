@@ -44,7 +44,6 @@
 
 
 (comment
-; tests
 
   (parse-tagdoc "test/data/little-docs.txt")
 
