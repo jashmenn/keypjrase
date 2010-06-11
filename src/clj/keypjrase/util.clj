@@ -10,3 +10,7 @@
   (if (contains? map key)
     map
     (assoc map key val)))
+
+(defn map-function-on-map-vals [data f]
+  (zipmap (keys data) (map f (vals data))))
+

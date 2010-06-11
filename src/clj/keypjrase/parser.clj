@@ -38,8 +38,7 @@
   [input]
   (process-file input extract-document-from-line))
 
-(defn parse-input [parser input]
-  ; "todo. actually use the parser variable"
+(defn parse-input [parser input] ; todo. actually use the parser variable
   (parse-tagdoc input))
 
 

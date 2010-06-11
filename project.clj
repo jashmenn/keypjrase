@@ -16,6 +16,7 @@
   :namespaces [keypjrase.playground
                keypjrase.util
                keypjrase.parser
+               keypjrase.stemmer
                ]
   :run-aliases {:train [keypjrase.playground -main 
                           "data/bookmarks/nates/train.txt" 
