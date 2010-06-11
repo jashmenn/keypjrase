@@ -35,6 +35,16 @@
 (defn body-frequencies [document] 
   (frequencies (stem-all (document :body))))
 
+(defn potential-phrases [document]
+  (document :body)) ; for now
+
+(defn global-phrase-count [phrase stats]
+  (let [counts (stats :df)]
+    (counts phrase)))
+
+(defn stem-global-phrase-count [unstemmed-phrase stats]
+  (global-phrase-count (stem unstemmed-phrase) stats))
+
 (comment test-objects)
 
 (def test-documents
@@ -47,6 +57,7 @@
                         :tags #{"dog" "flea"})])
 
 (def test-document (last test-documents))
+(def test-frequencies (body-frequencies test-document))
 
 (def test-stats
   (struct-map collection-stats :df {"flea" 1, "carrot" 1, "go" 1, "still" 1,
