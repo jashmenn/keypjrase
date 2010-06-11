@@ -1,7 +1,7 @@
 (ns keypjrase.instance
   (:require [clojure.contrib [str-utils :as s]]) 
   (:use [keypjrase.stemmer] :reload)
-  (:use [clojure.contrib.seq-utils :only [find-first indexed frequencies]])
+  (:use [clojure.contrib.seq-utils :only [find-first indexed frequencies flatten]])
   (:use [clojure.contrib.generic.math-functions :only [log]])
   (:require [keypjrase [document :as d]] :reload))
 
@@ -19,7 +19,6 @@
         tf (/ local-val length)
         idf (- (log (/ (+ global-val 1) (+ (stats :num-documents) 1))))]
   (* tf idf)))
-
 
 (defn calculate-phrase-features
   "this function has so many parameters because we need to calculate many
@@ -42,16 +41,12 @@
   (map #(apply calculate-phrase-features 
                [% document local-counts first-occur stats])
   (d/potential-phrases document))))
-(calculate-document-instances d/test-document d/test-stats)
 
 (defn create-instances-w-docs
   "given documents"
   [documents stats]
-  (map #(apply calculate-document-instances [% stats]) documents))
-
-  ; tfidf (tfidf document document-counts stats training?)
-  ; document-counts))
-
+  (flatten (map #(apply calculate-document-instances [% stats]) documents)))
+(create-instances-w-docs d/test-documents d/test-stats)
 
 (comment
 
@@ -59,7 +54,7 @@
 
   (create-instances-w-docs d/test-documents d/test-stats)
 
-  (calculate-features d/test-document d/test-stats true)
+  (calculate-document-instances d/test-document d/test-stats)
 
   (calculate-phrase-features "flea" d/test-document d/test-frequencies 
                            d/test-first-occur d/test-stats)
