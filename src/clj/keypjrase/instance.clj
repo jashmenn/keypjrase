@@ -10,6 +10,12 @@
 (defstruct instance :token :class :features)
 (defstruct features :distance :tfidf :pos)
 
+(defn training*
+  "Evaluates func in the context of a training"
+  [func]
+  (binding [*training?* true]
+    (func)))
+
 (defn tf-idf
   [phrase document local-counts stats]
   (let [local-val (local-counts phrase)

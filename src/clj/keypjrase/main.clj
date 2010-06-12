@@ -1,27 +1,11 @@
-; Usage:
-;
-; REPL: 
-;   $ env JAVA_OPTS=-Xmx768m LEIN_CLASSPATH=src/clj ~/lib/lein repl
-;   # OR
-;   $ lein uberjar && hadoop jar bonobo-geo-standalone.jar clojure.lang.Repl
-;   # then 
-;   (use 'keypjrase.playground) (bootstrap)
-;
-
-(ns keypjrase.playground
+(ns keypjrase.main
   (:require clojure.contrib.str-utils)
   (:require [keypjrase [parser :as parser] 
               [document :as document] [instance :as instance]
               [classifier :as classifier]] :reload)
   (:use [keypjrase.util] :reload)
-  (:gen-class)
-  )
-
-(defmacro bootstrap []
-  '(do
-    (use (quote [clojure.contrib.seq-utils :only [find-first]]))
-    (ns keypjrase.playground) ; tmp?
-  ))
+  (:use clojure.contrib.command-line)
+  (:gen-class))
 
 (defn -train [input-data output-dir & options]
   (instance/training*
@@ -38,15 +22,9 @@
       (println (str "saved to " output-dir))
     ))))
 
-
-(comment 
-
-   (use 'keypjrase.playground) (bootstrap)
-
-   (time (-train "data/bookmarks/nates/train.txt" "tmp/foo"))
-  
-   (time (-train "data/bookmarks/nates/train-10.txt" "tmp/foo"))
-
-   (.printStackTrace *e)
-
-)
+(defn -main [& args]
+  (with-command-line args
+    "keypjrase: key-phrase extraction"
+    [remaining]
+    (let [[mode input-dir output-dir] remaining]
+      (apply-str (str "-" mode) input-dir output-dir))))

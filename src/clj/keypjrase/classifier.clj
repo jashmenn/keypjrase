@@ -12,13 +12,6 @@
 
 ; todo, build our own classifier. for now just use weka / clj-ml
 
-(defn build [instances]
-  (let [ds (build-dataset-from-instances instances)
-        classifier (build-classifier-obj)]
-    (do
-      (.buildClassifier classifier ds)
-      ; (prn classifier)
-      classifier)))
 
 (defn build-dataset-from-instances [instances]
   (let [instance-vecs (map i/to-instance-vec instances)
@@ -33,7 +26,14 @@
       (.setFilter fclass (new Discretize))
       fclass)))
 
-(defn save-classifier [classifier out-file]
+(defn build [instances]
+  (let [ds (build-dataset-from-instances instances)
+        classifier (build-classifier-obj)]
+    (do
+      (.buildClassifier classifier ds)
+      classifier)))
+
+(defn save [classifier out-file]
   (let [buf-out (new BufferedOutputStream (new FileOutputStream out-file))
         out (new ObjectOutputStream buf-out)]
     (do
@@ -41,7 +41,7 @@
       (.flush out)
       (.close out))))
 
-(defn load-classifier [in-file]
+(defn restore [in-file]
   (let [buf-in (new BufferedInputStream (new FileInputStream in-file))
         in (new ObjectInputStream buf-in)
         classifier (.readObject in)]
@@ -56,8 +56,8 @@
   (build i/test-instances)
 
   (let [c (build i/test-instances)]
-    (save-classifier c "tmp/classifier.dat"))
+    (save c "tmp/classifier.dat"))
 
-  (load-classifier "tmp/classifier.dat")
+  (restore "tmp/classifier.dat")
 
   )

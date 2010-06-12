@@ -17,12 +17,16 @@
                keypjrase.util
                keypjrase.parser
                keypjrase.stemmer
-               ]
-  :run-aliases {:train [keypjrase.playground -main 
-                          "data/bookmarks/nates/train.txt" 
-                          "data/cutpoints"]
-                :extract [keypjrase.playground -main 
+               keypjrase.classifier
+               keypjrase.document
+               keypjrase.instance
+               keypjrase.main ]
+  :run-aliases {:train [keypjrase.main -main 
+                          "train"
+                          "data/bookmarks/nates/train-10.txt" 
+                          "tmp/runs"]
+                :extract [keypjrase.main -main 
+                          "extract"
                           "data/bookmarks/nates/test.txt" 
-                          "data/cutpoints" 
-                          "data/extracted"]}
+                          "tmp/runs"]}
   :main keypjrase.playground) 

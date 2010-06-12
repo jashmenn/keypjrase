@@ -1,4 +1,6 @@
 (ns keypjrase.util
+  (:import [java.io File FileWriter]) 
+  (:use [clojure.core])
   (:require clojure.contrib.str-utils))
 
 ; todo should be a macro
@@ -13,4 +15,19 @@
 
 (defn map-function-on-map-vals [data f]
   (zipmap (keys data) (map f (vals data))))
+
+(defn save-data-to [file-name data]
+ (with-open [w (FileWriter. (File. file-name))]
+ (binding [*out* w]
+    (prn data))))
+
+(defn read-data-structure [file-name]
+  (try
+   (let [object (read-string (slurp file-name))]
+    object)
+   (catch Exception e nil)))
+
+(defn apply-str [fname & args]
+  (apply (ns-resolve *ns* (symbol fname)) args))
+
 
