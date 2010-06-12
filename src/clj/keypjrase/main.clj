@@ -8,7 +8,7 @@
   (:gen-class))
 
 (defn -train [input-data output-dir & options]
-  (instance/training*
+  (instance/with-training* ;(fn [] ; ew, how do i get rid of this? macros?
   (let [opts (merge 
                {:parser "tagdoc"}
                (apply hash-map options))
@@ -26,5 +26,8 @@
   (with-command-line args
     "keypjrase: key-phrase extraction"
     [remaining]
-    (let [[mode input-dir output-dir] remaining]
-      (apply-str (str "-" mode) input-dir output-dir))))
+    (if (= (first remaining) "train")                 
+        (let [[mode input-dir output-dir] remaining]
+          (do
+            (prn mode)
+          (-train input-dir output-dir))))))

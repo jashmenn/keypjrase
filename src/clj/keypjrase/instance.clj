@@ -10,11 +10,11 @@
 (defstruct instance :token :class :features)
 (defstruct features :distance :tfidf :pos)
 
-(defn training*
+(defmacro with-training*
   "Evaluates func in the context of a training"
-  [func]
-  (binding [*training?* true]
-    (func)))
+  [body]
+  `(binding [*training?* true]
+    (~@body)))
 
 (defn tf-idf
   [phrase document local-counts stats]

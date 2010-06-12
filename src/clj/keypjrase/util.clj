@@ -27,7 +27,7 @@
     object)
    (catch Exception e nil)))
 
-(defn apply-str [fname & args]
+(defmacro apply-str [fname & args] ; doesn't work
   (apply (ns-resolve *ns* (symbol fname)) args))
 
 
