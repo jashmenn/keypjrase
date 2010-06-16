@@ -7,7 +7,7 @@
 
 (def *training?* false)
 
-(defstruct instance :token :class :features)
+(defstruct instance :token :class :features :predicted-class :predicted-probability)
 (defstruct features :distance :tfidf :pos)
 
 (defmacro with-training*

@@ -30,4 +30,7 @@
 (defmacro apply-str [fname & args] ; doesn't work
   (apply (ns-resolve *ns* (symbol fname)) args))
 
+(def neg-inf java.lang.Float/NEGATIVE_INFINITY)
+(def pos-inf java.lang.Float/POSITIVE_INFINITY)
 
+(defn as-percent [numer denom] (* (/ (float numer) (float denom)) 100))
