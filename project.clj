@@ -20,15 +20,17 @@
                keypjrase.classifier
                keypjrase.document
                keypjrase.instance
+               keypjrase.test
                keypjrase.main ]
   :run-aliases {:train [keypjrase.main -main 
                           "train"
                           "data/bookmarks/nates/train-100.txt" 
                           "tmp/runs"]
-                :extract [keypjrase.main -main 
-                          "extract"
-                          "data/bookmarks/nates/test.txt" 
+                :test-extraction [keypjrase.main -main 
+                          "test"
+                          "data/bookmarks/nates/test-10.txt" 
                           "tmp/runs"
-                          "tmp/runs-out"]}
+                          "tmp/runs-out"
+                          "20"]}
                          
   :main keypjrase.playground) 

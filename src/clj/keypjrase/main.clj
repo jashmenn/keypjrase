@@ -5,6 +5,7 @@
               [document :as document] [instance :as instance]
               [classifier :as classifier]] :reload)
   (:use [keypjrase.util] :reload)
+  (:use [keypjrase.test] :reload)
   (:use clojure.contrib.command-line)
   (:gen-class))
 
@@ -33,8 +34,15 @@
   (with-command-line args
     "keypjrase: key-phrase extraction"
     [remaining]
-    (if (= (first remaining) "train")                 
-        (let [[mode input-dir output-dir] remaining]
-          (do
-            (prn mode)
-          (-train input-dir output-dir))))))
+    (let [mode (first remaining)]
+    (cond (= mode "train")                 
+          (let [[mode input-dir output-dir] remaining]
+            (do
+              (prn mode)
+            (time (-train input-dir output-dir))))
+          (= mode "test") 
+          (let [[mode input-data training-dir output-dir at] remaining]
+            (do
+              (prn mode)
+            (time (-test input-data training-dir output-dir (Integer/parseInt at)))))
+      ))))

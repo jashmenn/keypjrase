@@ -6,6 +6,7 @@
               [classifier :as classifier]] :reload)
   (:use [keypjrase.util] :reload)
   (:use [clj-ml.filters])
+  (:use [clojure.set])
   (:use clojure.contrib.command-line)
   (:gen-class))
 
@@ -50,45 +51,48 @@
       (cons new-instance acc)))
     '() instances))
 
+(defn top-n-predicted [predicted n]
+  (take n (sort #(compare (%1 :predicted-probability) (%2 :predicted-probability)) predicted)))
+
+(defn prediction-numbers [predicted actual right] 
+  (let [num-right (count right)
+        prec (if-gt-zero (count predicted) (/ (count right) (count predicted)) 0)
+        rec  (if-gt-zero (count actual) (/ (count right) (count actual)) 1) ; default?
+        f    (if-gt-zero (+ prec rec) (* 2 (/ (* prec rec) (+ prec rec))) 0)
+        hit  (if-gt-zero num-right 1 0)] ; did we guess any tags right?
+  {:precision prec, :recall rec, :fmeasure f, 
+   :num-right num-right, :num-possible (count actual), :hit hit} ))
+
 (defn predict-tags 
   "given list of instance-structs, returns a list of predicted tags and their
   probabilities"
-  [instances classifier]
-  (let [predicted (predict-instances instances classifier)
-        ; tag-probs (remove (fn [instance] (= (instance :predicted-class) false)) predicted)
-        tag-probs predicted
-        ]
-    tag-probs))
+  [instances classifier at]
+  (let [predictions (predict-instances instances classifier) ;predictions test-predictions
+        all-predicted (filter #(:predicted-class %) predictions)
+        predicted (set (map :token (top-n-predicted all-predicted at)))
+        actual (set (map :token (filter #(:class %) predictions)))
+        right (intersection actual predicted)]
+      (do
+      (prn right) ; todo log
+      (merge (prediction-numbers predicted actual right) {:count 1})
+      )))
 
-; (defn calculate-document-test-stats
-;   [document]
-;   (let [
-;         actual (set (entry :tags))
-;         right (intersection actual predicted)
-;         num-right (count right)
-; 
-;         ]
-;
-;     ))
-
-(defn test-a-document [document stats classifier]
+(defn test-a-document [document stats classifier at]
   (let [instances (instance/create-instances-w-docs [document] stats)
-        predicted-tags (predict-tags instances classifier)]
+        predicted-tags (predict-tags instances classifier at)]
   predicted-tags))
-(test-a-document d/test-document test-stats test-classifier)
 
-(defn perform-test [documents collection-stats classifier]
-  (let [test-stats {}
-        at 20] ; calculate stats at 20
+(defn perform-test [documents collection-stats classifier at] 
+  (let [test-stats {}]
     (reduce
       (fn [acc document]
       (m/deep-merge-with + acc 
-                         (test-a-document document collection-stats classifier)))
+                         (test-a-document document collection-stats classifier at)))
       test-stats documents)))
 
 (defn -test 
   "two things, extraction and test"
-  [input-data training-dir output-dir & options]
+  [input-data training-dir output-dir at & options]
   (let [opts (merge
                {:parser "tagdoc"}
                (apply hash-map options))
@@ -99,17 +103,31 @@
         classifier (do (prn "reading classifier") 
                      (classifier/restore (str training-dir "/classifier")))
    ]
-    (perform-test documents stats classifier)
+    (prn (perform-test documents stats classifier at))
   ))
+
+(comment test-data)
+
+(def test-instance-struct {:token "dog", :class true, :features {:distance 1/10, :tfidf 0.5991464547107982, :pos nil}})
+(def test-stats (read-data-structure "tmp/runs/stats.clj"))
+(def test-classifier (classifier/restore "tmp/runs/classifier"))
+(def test-predictions 
+'({:token "ya", :class false, :features 
+    {:distance 4/5, :tfidf 0.3506, :pos nil},  :predicted-class false, :predicted-probability 0.7243} 
+  {:token "market", :class false, :features 
+    {:distance 7/10, :tfidf 0.2302, :pos nil}, :predicted-class true, :predicted-probability 0.8243}
+  {:token "flea", :class true, :features 
+    {:distance 1/5, :tfidf 0.9210, :pos nil},  :predicted-class true, :predicted-probability 0.7243} 
+  {:token "go", :class false, :features 
+    {:distance 3/5, :tfidf 0.1049, :pos nil},  :predicted-class false, :predicted-probability 0.2243} 
+  {:token "though", :class false, :features 
+    {:distance 1/2, :tfidf 0.1469, :pos nil},  :predicted-class false, :predicted-probability 0.8243})
+)
+
 
 (comment 
 
-  (perform-test d/test-documents test-stats test-classifier)
+  (perform-test d/test-documents test-stats test-classifier 20)
 
   (test-a-document d/test-document test-stats test-classifier)
-
-  (def test-instance-struct {:token "dog", :class true, :features {:distance 1/10, :tfidf 0.5991464547107982, :pos nil}})
-  (def test-stats (read-data-structure "tmp/runs/stats.clj"))
-  (def test-classifier (classifier/restore "tmp/runs/classifier"))
-
   )

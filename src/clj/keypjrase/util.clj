@@ -34,3 +34,9 @@
 (def pos-inf java.lang.Float/POSITIVE_INFINITY)
 
 (defn as-percent [numer denom] (* (/ (float numer) (float denom)) 100))
+
+(defmacro if-gt-zero [testval tval fval]
+  `(let [testval# ~testval]
+    (if (> testval# 0) ~tval ~fval)))
+
+
