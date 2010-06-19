@@ -31,6 +31,12 @@
                           "data/bookmarks/nates/test.txt" 
                           "tmp/runs"
                           "tmp/runs-out"
+                          "20"]
+                :extract [keypjrase.main -main
+                          "extract"
+                          "data/bookmarks/nates/test.txt" 
+                          "tmp/runs"
+                          "tmp/runs-out"
                           "20"]}
                          
   :main keypjrase.playground) 
