@@ -24,11 +24,11 @@
                keypjrase.main ]
   :run-aliases {:train [keypjrase.main -main 
                           "train"
-                          "data/bookmarks/nates/train-100.txt" 
-                          "tmp/runs"]
+                          "data/bookmarks/nates/train.txt" 
+                          "tmp/runs-all"]
                 :test-extraction [keypjrase.main -main 
                           "test"
-                          "data/bookmarks/nates/test-10.txt" 
+                          "data/bookmarks/nates/test.txt" 
                           "tmp/runs"
                           "tmp/runs-out"
                           "20"]}

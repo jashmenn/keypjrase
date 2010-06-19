@@ -36,7 +36,7 @@
   (frequencies (stem-all (document :body))))
 
 (defn potential-phrases [document]
-  (document :body)) ; for now
+  (distinct (document :body))) ; for now
 
 (defn global-phrase-count [phrase stats]
   (let [counts (stats :df)]
