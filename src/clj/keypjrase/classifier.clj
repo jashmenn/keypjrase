@@ -28,7 +28,7 @@
 (defn build-multifilter [ds]
   (let [mf (new weka.filters.MultiFilter)
         filters (into-array weka.filters.Filter 
-                            [(normalize-filter ds {:scale 5}) ; tmp
+                            [(normalize-filter ds {:scale 100}) ; tmp
                              (discretize-filter ds [1 2])])]
     (do 
       (.setFilters mf filters)

@@ -24,17 +24,24 @@
                keypjrase.main ]
   :run-aliases {:train [keypjrase.main -main 
                           "train"
-                          "data/bookmarks/nates/train.txt" 
-                          "tmp/runs-all"]
+                          "data/bookmarks/nates/train-100.txt" 
+                          "tmp/runs-100"]
                 :test-extraction [keypjrase.main -main 
                           "test"
-                          "data/bookmarks/nates/test.txt" 
-                          "tmp/runs"
-                          "tmp/runs-out"
+                          "data/bookmarks/nates/test-1.txt" 
+                          "tmp/runs-100"
+                          "tmp/runs-out" 
                           "20"]
+                :test-thresh-1 [keypjrase.test -test-tfidf-threshold 
+                          "data/bookmarks/nates/test.txt"
+                          "tmp/runs"
+                          "tmp/test-threshold-out"]
+                :test-thresh-2 [keypjrase.test -test-prob-threshold 
+                          "data/bookmarks/nates/test.txt"
+                          "tmp/runs"
+                          "tmp/test-threshold-out"]
                 :extract [keypjrase.main -main
                           "extract"
-                          "data/bookmarks/nates/test.txt" 
                           "tmp/runs"
                           "tmp/runs-out"
                           "20"]}

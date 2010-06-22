@@ -3,7 +3,7 @@
   (:require [clojure.contrib [map-utils :as m]])
   (:require [keypjrase [parser :as parser] 
               [document :as document] [instance :as instance]
-              [classifier :as classifier]] :reload)
+              [extract :as extract] [classifier :as classifier]] :reload)
   (:use [keypjrase.util] :reload)
   (:use [keypjrase.test] :reload)
   (:use clojure.contrib.command-line)
@@ -35,7 +35,7 @@
     "keypjrase: key-phrase extraction"
     [remaining]
     (let [mode (first remaining)]
-    (cond (= mode "train")                 
+    (cond (= mode "train") ; todo macrofy
           (let [[mode input-dir output-dir] remaining]
             (do
               (prn mode)
@@ -44,5 +44,11 @@
           (let [[mode input-data training-dir output-dir at] remaining]
             (do
               (prn mode)
-            (time (-test input-data training-dir output-dir (Integer/parseInt at)))))
+            (time (-test input-data training-dir output-dir :at (Integer/parseInt at)))))
+          (= mode "extract") 
+          (let [[mode training-dir output-dir at input-data] remaining]
+            (do
+              (prn mode)
+            (time (extract/-extract training-dir output-dir (Integer/parseInt at) input-data))))
+
       ))))

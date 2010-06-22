@@ -24,6 +24,22 @@
     )))
 
 ; todo, refactor this, its really just picking the true class
+
+(defn find-first 
+  "returns the first element in s for which (pred element) returns true"
+  [pred s]
+  (loop [element (first s)
+         cdr     (rest s)]
+            (if (pred element)
+                element
+                (if (seq cdr)
+                    (recur (first cdr) (rest cdr))
+                    nil))))
+
+; (defn find-first-with-index [pred s]
+;   (let [w-index (zipmap (range 0 (count s)) s)] ; built-in for this?
+;     (find-first pred w-index))
+
 (defn select-best-class
   [distribution ds]
   (reduce (fn [[best-klass best-val] [key val]]
@@ -34,13 +50,27 @@
       [best-klass best-val])
    )) [false neg-inf] (zipmap (range 0 (count distribution)) distribution))) ; built in for this?
 
+(defn seq-to-indexed-map [s]
+  (zipmap (range 0 (count s)) s)) ; built-in for this?
+
+(defn probability-of-class 
+      [distribution ds klass]
+  (last (find-first (fn [[i v]] ; still kind of hacky
+                  (= klass (class-double-to-name k ds)))
+              seq-to-indexed-map)))
 
 (defn instance-distribution [instance classifier]
   (let [ds (classifier/build-dataset-from-instances [instance])
         filtered-ds (filter-apply (.getFilter classifier) ds)
         dist (seq (.distributionForInstance classifier 
                                             (.firstInstance filtered-ds)))]
-      [dist filtered-ds]))
+       (do
+         ; (if (= (instance :token) "humour")
+         ;     (do
+         ; (prn instance)
+         ; (prn (.firstInstance filtered-ds))
+         ; (prn dist)))
+      [dist filtered-ds])))
 
 ; just classify everything as true and then take the top n of those
 (defn classify-instance 
@@ -50,10 +80,16 @@
     (select-best-class dist ds)
   ))
 
+(defn probability-of-class 
+      [distribution ds klass]
+  (last (find-first (fn [[i v]] ; still kind of hacky
+                  (= klass (class-double-to-name k ds)))
+              seq-to-indexed-map)))
+
 (defn predict-instance
   [instance classifier]
-  (let [[predicted-class predicted-prob] 
-           (classify-instance instance classifier)
+  (let [;[predicted-class predicted-prob] (classify-instance instance classifier)
+        prob-true ( TODO - right here you are refactoring from classify-instance to taking theprobability of true. 
         new-instance (merge instance 
                             {:predicted-class predicted-class 
                              :predicted-probability predicted-prob})]
@@ -77,8 +113,41 @@
 
 (defn top-n-predicted [predicted n]
   (take n 
-    (reverse (sort #(compare (%1 :predicted-probability) (%2 :predicted-probability))
+    (reverse (sort-by #(vec [(% :predicted-probability) 
+                             ((% :features) :tfidf)])
           predicted))))
+
+(defn top-n-predicted-w-thresh [predicted options]
+  (let [t (get options :tfidf-threshold 0.0)
+        p (get options :prob-threshold 0.0)
+        good-enough-1 (remove #(< ((% :features) :tfidf) t) predicted)
+        good-enough   (remove #(< (% :predicted-probability) p) good-enough-1)]
+     (top-n-predicted good-enough (options :at))))
+
+
+; next up: add a threshold to tfidf
+
+(defn -extract 
+  [training-dir output-dir at input-data & options]
+  (let [opts (merge
+               {:parser "tagdoc"}
+               (apply hash-map options))
+        documents (do (prn "parsing docs") 
+                    (parser/parse-input (opts :parser) input-data))
+        stats (do (prn "reading stats") 
+                    (read-data-structure (str training-dir "/stats.clj")))
+        classifier (do (prn "reading classifier") 
+                     (classifier/restore (str training-dir "/classifier")))]
+    (map (fn [document]
+      (let [instances (instance/create-instances-w-docs [document] stats)
+            predictions (top-n-predicted 
+                    (predict-instances instances document classifier 2) at)
+            ; pred (map #(vec [(:token %) (:tfidf (:features %))]) predictions)]
+            pred (map #(:token %) predictions)]
+           (prn pred)
+               )) documents)))
+
+
 
 (comment test-data)
 
