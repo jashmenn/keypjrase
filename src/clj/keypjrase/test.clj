@@ -25,8 +25,9 @@
 (defn generate-prediction-numbers 
   [instances document classifier options]
   (let [predictions (predict-instances instances document classifier 2) ;predictions test-predictions
-        x (prn predictions)
-        all-predicted (filter #(:predicted-class %) predictions)
+        ;; x (prn predictions)
+        ;;all-predicted (filter #(:predicted-class %) predictions)
+        all-predicted predictions ;; 
         ; predicted (set (map :token (top-n-predicted all-predicted (options :at))))
         predicted (set (map :token 
           (top-n-predicted-w-thresh all-predicted options)))
@@ -37,12 +38,11 @@
         actual (set (map :token (filter #(:class %) predictions)))
         ; actual (document :tags)
         right (intersection actual predicted)]
-      (do
         ; (prn (top-n-predicted all-predicted at))
         ; (prn predictions)
       (prn [predicted right actual]) ; todo log
       (merge (prediction-numbers predicted actual right) {:count 1})
-      )))
+      ))
 
 (defn test-a-document [document stats classifier options]
   (let [instances (instance/create-instances-w-docs [document] stats)
@@ -147,12 +147,13 @@
 
   (classify-instance test-instance-struct test-classifier)
 
-  (perform-test d/test-documents test-stats test-classifier 20)
 
   (test-a-document d/test-document test-stats test-classifier 20)
 
   (predict-instances instance/test-instances d/test-document test-classifier 2)
 
    (instance-distribution (first instance/test-instances) test-classifier)
+
+  (perform-test d/test-documents test-stats test-classifier {:at 20})
 
   )

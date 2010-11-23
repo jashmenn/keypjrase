@@ -176,4 +176,5 @@
   {:token "though", :class false, :features 
     {:distance 1/2, :tfidf 0.1469, :pos nil},  
     :predicted-class false, :predicted-probability 0.8243})
+
 )

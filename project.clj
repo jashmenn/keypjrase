@@ -30,7 +30,7 @@
                           "tmp/runs-100"]
                 :test-extraction [keypjrase.main -main 
                           "test"
-                          "data/bookmarks/nates/test-1.txt" 
+                          "data/bookmarks/nates/test-50.txt" 
                           "tmp/runs-100"
                           "tmp/runs-out" 
                           "20"]
