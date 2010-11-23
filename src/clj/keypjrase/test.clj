@@ -1,3 +1,4 @@
+
 (ns keypjrase.test
   (:require clojure.contrib.str-utils)
   (:require [clojure.contrib [map-utils :as m]])
@@ -24,6 +25,7 @@
 (defn generate-prediction-numbers 
   [instances document classifier options]
   (let [predictions (predict-instances instances document classifier 2) ;predictions test-predictions
+        x (prn predictions)
         all-predicted (filter #(:predicted-class %) predictions)
         ; predicted (set (map :token (top-n-predicted all-predicted (options :at))))
         predicted (set (map :token 

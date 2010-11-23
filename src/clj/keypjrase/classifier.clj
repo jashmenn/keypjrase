@@ -1,8 +1,10 @@
+
 (ns keypjrase.classifier
   (:use [clojure.contrib.generic.math-functions :only [log]])
   (:require [keypjrase [document :as d] [instance :as i]] :reload)
   (:use [clj-ml.data])
   (:use [clj-ml.filters])
+  (:use [clojure.contrib.duck-streams :only [spit]])
   (:import [java.io File FileOutputStream FileInputStream 
             BufferedInputStream BufferedOutputStream 
             ObjectInputStream ObjectOutputStream])
@@ -20,7 +22,8 @@
     labeled-dataset))
 
 (defn discretize-filter [ds attributes]
-  (make-filter :supervised-discretize {:dataset-format ds :attributes attributes}))
+  (make-filter :supervised-discretize 
+               {:dataset-format ds :attributes attributes}))
 
 (defn normalize-filter [ds opts]
   (make-filter :normalize (merge {:dataset-format ds} opts)))
@@ -47,15 +50,22 @@
         classifier (build-classifier-obj ds)]
     (do
       (.buildClassifier classifier ds)
+      (println (.toString classifier))
       classifier)))
 
-(defn save [classifier out-file]
+(defn with-obj-out-stream [out-file f]
   (let [buf-out (new BufferedOutputStream (new FileOutputStream out-file))
         out (new ObjectOutputStream buf-out)]
-    (do
-      (.writeObject out classifier)
-      (.flush out)
-      (.close out))))
+    (f out)
+    (.flush out)
+    (.close out)))
+
+(defn save [classifier out-file]
+  ;; write actual data file
+  (with-obj-out-stream out-file (fn [out] (.writeObject out classifier)))
+  ;; write out human txt version
+  (prn "saved txt version of classifier to " (str out-file ".txt"))
+  (spit (str out-file ".txt") (.toString classifier)))
 
 (defn restore [in-file]
   (let [buf-in (new BufferedInputStream (new FileInputStream in-file))

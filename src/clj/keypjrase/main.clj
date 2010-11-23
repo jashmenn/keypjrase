@@ -1,3 +1,4 @@
+
 (ns keypjrase.main
   (:require clojure.contrib.str-utils)
   (:require [clojure.contrib [map-utils :as m]])
@@ -14,13 +15,17 @@
   (let [opts (merge 
                {:parser "tagdoc"}
                (apply hash-map options))
-        documents (do (prn "parsing docs") 
-                    (parser/parse-input (opts :parser) input-data))
-        stats (do (prn "calculate stats") 
-                    (document/calculate-collection-stats documents))
-        instances (do (prn "create instances")
-                    (instance/create-instances-w-docs documents stats))
-        classifier (do (prn "building classifier") 
+        documents  (do 
+                     (prn "parsing docs") 
+                     (parser/parse-input (opts :parser) input-data))
+        stats      (do 
+                     (prn "calculate stats") 
+                     (document/calculate-collection-stats documents))
+        instances  (do 
+                     (prn "create instances")
+                     (instance/create-instances-w-docs documents stats))
+        classifier (do 
+                     (prn "building classifier") 
                      (classifier/build instances))]
 
     (do

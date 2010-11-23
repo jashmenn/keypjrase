@@ -1,3 +1,4 @@
+
 (ns keypjrase.document
   (:use [keypjrase.stemmer] :reload)
   (:use [clojure.contrib.seq-utils :only [find-first indexed frequencies]])

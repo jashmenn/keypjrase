@@ -12,6 +12,8 @@
                  [lein-run "1.0.0-SNAPSHOT"]]
   :dev-dependencies [[lein-javac "0.0.2-SNAPSHOT"]
                      [org.apache.hadoop/hadoop-core "0.20.2-dev"]
+                     [swank-clojure "1.2.1"] 
+                     [lein-run "1.0.0-SNAPSHOT"]
                      [org.clojars.brandonw/lein-nailgun "1.0.0"]]
   :namespaces [keypjrase.playground
                keypjrase.util

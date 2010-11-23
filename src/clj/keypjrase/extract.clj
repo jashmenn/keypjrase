@@ -1,3 +1,4 @@
+
 (ns keypjrase.extract
   (:require clojure.contrib.str-utils)
   (:require [clojure.contrib [map-utils :as m]])
@@ -43,12 +44,14 @@
 (defn select-best-class
   [distribution ds]
   (reduce (fn [[best-klass best-val] [key val]]
-    (let [class-name (class-double-to-name key ds)]
-    ; (if (> val best-val)
-    (if (= class-name true)
-      [class-name val]
-      [best-klass best-val])
-   )) [false neg-inf] (zipmap (range 0 (count distribution)) distribution))) ; built in for this?
+            (let [class-name (class-double-to-name key ds)]
+                                        ; (if (> val best-val)
+              (if (= class-name true)
+                [class-name val]
+                [best-klass best-val])
+              )) 
+          [false neg-inf] 
+          (zipmap (range 0 (count distribution)) distribution))) ; built in for this?
 
 (defn seq-to-indexed-map [s]
   (zipmap (range 0 (count s)) s)) ; built-in for this?
@@ -56,7 +59,7 @@
 (defn probability-of-class 
       [distribution ds klass]
   (last (find-first (fn [[i v]] ; still kind of hacky
-                  (= klass (class-double-to-name k ds)))
+                  (= klass (class-double-to-name i ds))) ;; ?
               seq-to-indexed-map)))
 
 (defn instance-distribution [instance classifier]
@@ -83,34 +86,36 @@
 (defn probability-of-class 
       [distribution ds klass]
   (last (find-first (fn [[i v]] ; still kind of hacky
-                  (= klass (class-double-to-name k ds)))
+                  (= klass (class-double-to-name i ds))) ;; ?
               seq-to-indexed-map)))
 
 (defn predict-instance
   [instance classifier]
-  (let [;[predicted-class predicted-prob] (classify-instance instance classifier)
-        prob-true ( TODO - right here you are refactoring from classify-instance to taking theprobability of true. 
+  (let [[predicted-class predicted-prob] (classify-instance instance classifier)
+        ;;prob-true ;; TODO - right here you are refactoring from
+        ;;classify-instance to taking the probability of true. 
+        ;;predicted-class true ;; todo
+        ;;predicted-prob 0
         new-instance (merge instance 
                             {:predicted-class predicted-class 
                              :predicted-probability predicted-prob})]
     new-instance))
 
 (defn predict-instances
-      [instances document classifier min-count]
-      (let [freq (d/body-frequencies document)]
-           freq
-      (reduce  
-        (fn [acc instance]
-            (if (>= (get freq (instance :token) 0) min-count)
-                (cons (predict-instance instance classifier) acc)
-                acc))
-        '() instances)))
+  [instances document classifier min-count]
+  (let [freq (d/body-frequencies document)]
+    ;; freq
+    (reduce  
+     (fn [acc instance]
+       (if (>= (get freq (instance :token) 0) min-count)
+         (cons (predict-instance instance classifier) acc)
+         acc))
+     '() instances)))
 
-      ; calculate the document frequencies and create a map
-      ; for each instance, only calculate the probability of d
-      ; instnaces that occur more than the min count. al
-      ; when we actually choose one, we only want to predict the probabilityt that it is a tag
-
+; calculate the document frequencies and create a map
+; for each instance, only calculate the probability of d instances
+; that occur more than the min count. when we actually choose one,
+; we only want to predict the probability that it is a tag
 (defn top-n-predicted [predicted n]
   (take n 
     (reverse (sort-by #(vec [(% :predicted-probability) 
