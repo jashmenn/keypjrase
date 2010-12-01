@@ -9,6 +9,7 @@
                  [org.clojure/clojure-contrib "1.1.0"]
                  [clj-ml "0.0.3-SNAPSHOT"]
                  [org.clojars.thnetos/opennlp "0.0.5"]
+                 [net.htmlparser.jericho/jericho-html "3.1"]
                  [lein-run "1.0.0-SNAPSHOT"]]
   :dev-dependencies [[lein-javac "0.0.2-SNAPSHOT"]
                      [org.apache.hadoop/hadoop-core "0.20.2-dev"]
