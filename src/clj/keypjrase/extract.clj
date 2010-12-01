@@ -148,8 +148,10 @@
             predictions (top-n-predicted 
                     (predict-instances instances document classifier 2) at)
             ; pred (map #(vec [(:token %) (:tfidf (:features %))]) predictions)]
-            pred (map #(:token %) predictions)]
-           (prn pred)
+            ;;pred (map #(:token %) predictions)
+            ]
+           (prn (:url document))
+           (prn predictions)
                )) documents)))
 
 

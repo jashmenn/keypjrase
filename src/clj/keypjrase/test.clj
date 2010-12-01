@@ -29,19 +29,22 @@
         ;;all-predicted (filter #(:predicted-class %) predictions)
         all-predicted predictions ;; 
         ; predicted (set (map :token (top-n-predicted all-predicted (options :at))))
-        predicted (set (map :token 
-          (top-n-predicted-w-thresh all-predicted options)))
+        predicted (top-n-predicted-w-thresh all-predicted options)
+
+        predicted-tokens (set (map :token predicted))
         ; (comment "two definitions of 'actual'
         ;   1. the actual tags labeled and 
         ;   2. the tags that are possible to extract from the document itself
         ;   You can decide which definition you prefer")
         actual (set (map :token (filter #(:class %) predictions)))
         ; actual (document :tags)
-        right (intersection actual predicted)]
+        right (intersection actual predicted-tokens)]
         ; (prn (top-n-predicted all-predicted at))
         ; (prn predictions)
       (prn [predicted right actual]) ; todo log
-      (merge (prediction-numbers predicted actual right) {:count 1})
+      ;;(prn (:url document))
+      ;;(prn predicted)
+      (merge (prediction-numbers predicted-tokens actual right) {:count 1})
       ))
 
 (defn test-a-document [document stats classifier options]

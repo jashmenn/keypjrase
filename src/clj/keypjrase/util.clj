@@ -39,4 +39,20 @@
   `(let [testval# ~testval]
     (if (> testval# 0) ~tval ~fval)))
 
+(defn sum [numbers]
+  (reduce (fn [acc next] (+ acc next)) 0 numbers))
+
+(defn mean [numbers]
+  (/ (sum numbers) (count numbers)))
+
+(defn pop-variance [numbers]
+  (let [m (mean numbers)]
+    (/ (reduce (fn [acc next] (+ acc (Math/pow (- next m) 2))) 0 numbers)
+       (count numbers))))
+
+(defn pop-std-dev [numbers]
+  (Math/sqrt (pop-variance numbers)))
+
+(def variance pop-variance)
+(def std-dev pop-std-dev)
 

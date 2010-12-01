@@ -13,3 +13,21 @@ FIXME: write
 ## License
 
 FIXME: write
+
+
+## TODO
+What needs to happen to make this awesome?
+
+we need more stats about the suggested keywords. how strong are they
+recommended? can we come up with a better / dynamic threshold?
+
+how to we generate data for the input?
+how do we tie our suggested keywords back to the original source?
+
+seems to me we need to integrate the url / document name into the extraction process more cleanly - e.g. document id
+
+we need to move the ruby tools into this project
+
+for instance, better tools to help folks get their delicious bookmarks in here
+
+better option parsing

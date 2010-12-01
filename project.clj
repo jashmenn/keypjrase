@@ -44,8 +44,10 @@
                           "tmp/test-threshold-out"]
                 :extract [keypjrase.main -main
                           "extract"
-                          "tmp/runs"
+                          "tmp/runs-100"
                           "tmp/runs-out"
-                          "20"]}
+                          "20"
+                          "data/bookmarks/nates/test.txt"
+                          ]}
                          
   :main keypjrase.playground) 
