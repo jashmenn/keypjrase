@@ -42,6 +42,18 @@
 (defn parse-input [parser input] ; todo. actually use the parser variable
   (parse-tagdoc input))
 
+(defn extract-document-from-extraction-line [acc line]
+ (let [parts (s/re-split #"\t" line)
+       url (first parts)
+       body (tokenize-str (last parts))]
+     (if (> (count parts) 1)  
+         (cons (struct-map document :url url :body body) acc)
+         acc)))
+
+(defn parse-for-extraction 
+  [input]
+  (process-file input extract-document-from-extraction-line))
+
 
 (comment
 

@@ -5,8 +5,8 @@
   :java-fork "true"
   :javac-debug "true"
   :repositories [["clojars" "http://clojars.org/repo"]]
-  :dependencies [[org.clojure/clojure "1.1.0"]
-                 [org.clojure/clojure-contrib "1.1.0"]
+  :dependencies [[org.clojure/clojure "1.2.0"]
+                 [org.clojure/clojure-contrib "1.2.0"]
                  [clj-ml "0.0.3-SNAPSHOT"]
                  [org.clojars.thnetos/opennlp "0.0.5"]
                  [net.htmlparser.jericho/jericho-html "3.1"]

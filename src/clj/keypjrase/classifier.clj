@@ -4,7 +4,7 @@
   (:require [keypjrase [document :as d] [instance :as i]] :reload)
   (:use [clj-ml.data])
   (:use [clj-ml.filters])
-  (:use [clojure.contrib.duck-streams :only [spit]])
+  ;;(:use [clojure.contrib.duck-streams :only [spit]])
   (:import [java.io File FileOutputStream FileInputStream 
             BufferedInputStream BufferedOutputStream 
             ObjectInputStream ObjectOutputStream])

@@ -155,6 +155,61 @@
                )) documents)))
 
 
+;; for every webpage
+;; this would be run against a giant set of pages.
+;; what you will do is extract all the keywords into predictions, just
+;; like you're doing. but you need to create a new map of all the page
+;; -> predictions. split on the part of the path you are told to,
+;; upper half is the key, lower half is the second key, predictions
+;; are the value. 
+;; then from every site, you pick out the best terms by some measure.
+;; either best overall, maybe average?
+;; 
+
+(defn group-predictions-by [index predictions]
+  (reduce (fn [acc [path predictions]]
+            (assoc acc path predictions))
+          {}
+          predictions))
+
+(comment 
+  (def fake-predictions 
+       {
+        "foo/a/b" [{:token "hi"}]
+        "foo/a/c" [{:token "bye"}]
+        "foo/b/b" [{:token "my"}]
+        })
+  (group-predictions-by 1 fake-predictions)
+  )
+
+(defn -extract2
+  [training-dir output-dir at input-data & options]
+  (let [opts (merge
+               {:parser "tagdoc"}
+               (apply hash-map options))
+        documents (do 
+                    (prn "parsing docs") 
+                    (parser/parse-for-extraction input-data))
+        stats     (do 
+                    (prn "reading stats") 
+                    (read-data-structure (str training-dir "/stats.clj")))
+        classifier (do 
+                    (prn "reading classifier") 
+                    (classifier/restore (str training-dir "/classifier")))]
+    (reduce (fn [acc document]
+      (let [instances (instance/create-instances-w-docs [document] stats)
+            predictions (top-n-predicted 
+                    (predict-instances instances document classifier 2) at)]
+           (assoc acc (:url document) predictions)
+               )) {} documents)))
+
+(comment
+
+  (-extract2 "tmp/runs-100" "tmp/runs-out" 20 "test-data/toy-pages/processed.txt")
+
+  )
+
+
 
 (comment test-data)
 

@@ -2,7 +2,7 @@
 (ns keypjrase.instance
   (:require [clojure.contrib [str-utils :as s]]) 
   (:use [keypjrase.stemmer] :reload)
-  (:use [clojure.contrib.seq-utils :only [find-first indexed frequencies flatten]])
+  (:use [clojure.contrib.seq-utils :only [find-first indexed]])
   (:use [clojure.contrib.generic.math-functions :only [log]])
   (:require [keypjrase [document :as d]] :reload))
 

@@ -1,7 +1,7 @@
 
 (ns keypjrase.document
   (:use [keypjrase.stemmer] :reload)
-  (:use [clojure.contrib.seq-utils :only [find-first indexed frequencies]])
+  (:use [clojure.contrib.seq-utils :only [find-first indexed]])
   (:require clojure.contrib.str-utils))
 
 (defstruct document :url :body :tags)
