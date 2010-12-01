@@ -31,23 +31,33 @@
 
 ;; take a directory, go through all the files and process the files
 (defn process-html-dir [dir process-fn]
-   (map (fn [f] {(.toString f) (process-fn f)}) 
-        (filter #(re-find #".html$" (.toString %)) 
-                (file-seq (File. dir)))))
+   (reduce (fn [acc f] (assoc acc (.toString f) (process-fn f))) 
+           (hash-map)
+           (filter #(re-find #".html$" (.toString %)) 
+                    (file-seq (File. dir)))))
+
+(defn process-and-save-to [dir to process-fn]
+  (let [processed (process-html-dir dir process-fn)
+        lines (map (fn [[k v]] (str k "\t" v)) processed)]
+    (ds/spit to (apply str (interpose "\n" lines)))))
+
+(defn simplify-and-save-to [dir to]
+  (process-and-save-to dir to extract-and-simplify))
 
 (comment 
 
   (simplify "ASkn ... 23sda | 
  adsfjkjn #$#$ sd 123")
 
-  (def filename "data/raw-html/cosmetiquemedspa.com/index.html")
+  (def filename "test-data/toy-pages/secret/dont-crawl.html")
   (def file (java.io.File. filename))
   (def tex (TextExtractor. source))
   (.toString tex)
   (process-file file)
 
-  (def dirname "/Users/nmurray/programming/clojure/keyword-extraction-data/raw-html/cosmetiquemedspa.com")
+  (def dirname "test-data/toy-pages")
   (process-html-dir dirname extract-and-simplify)
+  (simplify-and-save-to dirname "cosmetique.txt")
 
   )
 
