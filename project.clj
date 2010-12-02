@@ -7,8 +7,9 @@
   :repositories {"clojars" "http://clojars.org/repo"}
   :dependencies [[org.clojure/clojure "1.2.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
+                 ;;[org.clojars.jashmenn/weka "3.6.2"]
                  [clj-ml "0.0.3-SNAPSHOT"]
-                 [org.clojars.thnetos/opennlp "0.0.5"]
+                 [org.clojars.thnetos/opennlp "0.0.6"]
                  [net.htmlparser.jericho/jericho-html "3.1"]
                  [lein-run "1.0.0-SNAPSHOT"]]
   :dev-dependencies [[lein-javac "0.0.2-SNAPSHOT"]
