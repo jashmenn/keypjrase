@@ -1,0 +1,3 @@
+test-data/toy-pages/secret/dont-crawl.html	oh no i said please 
+test-data/toy-pages/public/do-crawl.html	a pinecone haiku vision through the boughs pinecones decorating trees winter slowly fades
+test-data/toy-pages/fake1.html	title goes here this is my web page please don t crawl this crawl this instead
