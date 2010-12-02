@@ -1,6 +1,6 @@
 
 (ns keypjrase.extract
-  (:require clojure.contrib.str-utils)
+  (:require [clojure.contrib.str-utils2 :as su])
   (:require [clojure.contrib [map-utils :as m]])
   (:require [keypjrase [parser :as parser] 
               [document :as d] [instance :as instance]
@@ -166,20 +166,40 @@
 ;; either best overall, maybe average?
 ;; 
 
-(defn group-predictions-by [index predictions]
-  (reduce (fn [acc [path predictions]]
-            (assoc acc path predictions))
-          {}
-          predictions))
+(defn group-predictions-by 
+  "group the predictions by the index they have in common.
+   useful for grouping by 'host' or a common parent directory"
+  [index predictions]
+  (group-by (fn [[key prediction]]
+              (su/join "/" (take index (su/split key #"/")))) 
+            predictions))
+
+(defn group-predictions
+  "takes grouped predictions, removes the individual url's predictions and stuffs them into the groups predictions. (but each url has a separate map, because the scores were different for each url. this just prepares for further processsing"
+  [grouped]
+  (reduce (fn [acc [group page-preds]]
+            (let [current (or (acc group) [])
+                  group-preds 
+                    (reduce (fn [acc2 [url preds]] 
+                              (concat acc2 preds))
+                            [] page-preds)]
+                (assoc acc group (concat current group-preds))))
+          {} grouped))
 
 (comment 
   (def fake-predictions 
        {
-        "foo/a/b" [{:token "hi"}]
-        "foo/a/c" [{:token "bye"}]
-        "foo/b/b" [{:token "my"}]
+        "foo/a/b" [{:token "hi"  :predicted-probability 0.9}]
+        "foo/a/c" [{:token "bye" :predicted-probability 0.8}]
+        "foo/b/b" [{:token "my"  :predicted-probability 0.1}]
         })
-  (group-predictions-by 1 fake-predictions)
+  (group-predictions-by 2 fake-predictions)
+  (group-predictions (group-predictions-by 2 fake-predictions))
+
+  {"foo/a" [a b c]}
+  (def preds (group-predictions-by 2 fake-predictions))
+  preds
+
   )
 
 (defn -extract2
