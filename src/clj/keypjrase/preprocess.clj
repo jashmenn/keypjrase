@@ -1,4 +1,4 @@
-
+;; lein run keypjrase.preprocess simplify-and-save-to test-data/toy-pages/ foo.txt
 (ns keypjrase.preprocess
   (:require 
    [clojure.contrib.str-utils2 :as su]
@@ -6,7 +6,7 @@
    [clojure.contrib.duck-streams :as ds])
   (:use [keypjrase.util] :reload)
   (:import 
-   [java.io File BufferedInputStream FileInputStream]
+   [java.io File BufferedInputStream FileInputStream FileWriter BufferedWriter]
    [net.htmlparser.jericho Source TextExtractor]))
 
 (defn extract-text 
@@ -28,18 +28,20 @@
   (-> f
    (extract-text)
    (simplify)))
-
-;; take a directory, go through all the files and process the files
+ 
 (defn process-html-dir [dir process-fn]
-   (reduce (fn [acc f] (assoc acc (.toString f) (process-fn f))) 
-           (hash-map)
-           (filter #(re-find #".html$" (.toString %)) 
-                    (file-seq (File. dir)))))
+  (map (fn [f] (do
+         (println (str "processing " f))
+         (str (.toString f) "\t "(process-fn f) "\n")))
+       (filter #(re-find #".html$" (.toString %)) 
+               (file-seq (File. dir)))))
+
+(defn write-lines [file-name lines]
+  (with-open [wtr (BufferedWriter. (FileWriter. file-name))]
+    (doseq [line lines] (.write wtr line))))
 
 (defn process-and-save-to [dir to process-fn]
-  (let [processed (process-html-dir dir process-fn)
-        lines (map (fn [[k v]] (str k "\t" v)) processed)]
-    (ds/spit to (apply str (interpose "\n" lines)))))
+  (write-lines to (process-html-dir dir process-fn)))
 
 (defn simplify-and-save-to [dir to]
   (process-and-save-to dir to extract-and-simplify))
