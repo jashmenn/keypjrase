@@ -120,7 +120,7 @@
   (take n 
     (reverse (sort-by #(vec [(% :predicted-probability) 
                              ((% :features) :tfidf)])
-          predicted))))
+                      predicted))))
 
 (defn top-n-predicted-w-thresh [predicted options]
   (let [t (get options :tfidf-threshold 0.0)
@@ -186,42 +186,54 @@
                 (assoc acc group (concat current group-preds))))
           {} grouped))
 
+(defn highest-predictions-overall [preds]
+  (top-n-predicted preds 100))
+(defn highest-predictions-average [preds])
+
+(defn prediction-to-string [p]
+  (su/join "\t" [(:token p) (:predicted-probability p) ((p :features) :tfidf)]))
+(defn pretty-print-predictions [preds]
+  (su/join "\n" (map #(prediction-to-string %) preds)))
+
 (comment 
   (def fake-predictions 
        {
-        "foo/a/b" [{:token "hi"  :predicted-probability 0.9}]
-        "foo/a/c" [{:token "bye" :predicted-probability 0.8}]
-        "foo/b/b" [{:token "my"  :predicted-probability 0.1}]
+        "foo/a/b" [{:token "hi"  :predicted-probability 0.9 :features {:tfidf 0.9}}]
+        "foo/a/c" [{:token "bye" :predicted-probability 0.8 :features {:tfidf 0.9}}]
+        "foo/a/d" [{:token "hi"  :predicted-probability 0.1 :features {:tfidf 0.9}}]
+        "foo/b/b" [{:token "my"  :predicted-probability 0.1 :features {:tfidf 0.9}}]
         })
   (group-predictions-by 2 fake-predictions)
   (group-predictions (group-predictions-by 2 fake-predictions))
 
-  {"foo/a" [a b c]}
   (def preds (group-predictions-by 2 fake-predictions))
-  preds
+  (def gpre (group-predictions (group-predictions-by 2 fake-predictions)))
+  (highest-predictions-overall (gpre "foo/a"))
 
-  )
+  (println (pretty-print-predictions (highest-predictions-overall (gpre "foo/a"))))
 
-(defn -extract2
-  [training-dir output-dir at input-data & options]
-  (let [opts (merge
-               {:parser "tagdoc"}
-               (apply hash-map options))
-        documents (do 
-                    (prn "parsing docs") 
-                    (parser/parse-for-extraction input-data))
-        stats     (do 
-                    (prn "reading stats") 
-                    (read-data-structure (str training-dir "/stats.clj")))
-        classifier (do 
-                    (prn "reading classifier") 
-                    (classifier/restore (str training-dir "/classifier")))]
-    (reduce (fn [acc document]
-      (let [instances (instance/create-instances-w-docs [document] stats)
-            predictions (top-n-predicted 
-                    (predict-instances instances document classifier 2) at)]
-           (assoc acc (:url document) predictions)
-               )) {} documents)))
+  
+
+  (defn -extract2
+    [training-dir output-dir at input-data & options]
+    (let [opts (merge
+                {:parser "tagdoc"}
+                (apply hash-map options))
+          documents (do 
+                      (prn "parsing docs") 
+                      (parser/parse-for-extraction input-data))
+          stats     (do 
+                      (prn "reading stats") 
+                      (read-data-structure (str training-dir "/stats.clj")))
+          classifier (do 
+                       (prn "reading classifier") 
+                       (classifier/restore (str training-dir "/classifier")))]
+      (reduce (fn [acc document]
+                (let [instances (instance/create-instances-w-docs [document] stats)
+                      predictions (top-n-predicted 
+                                   (predict-instances instances document classifier 2) at)]
+                  (assoc acc (:url document) predictions)
+                  )) {} documents))))
 
 (comment
 
