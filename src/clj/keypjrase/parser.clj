@@ -8,7 +8,7 @@
 (def token-regex #"\w+")
 
 (def stop-words
-  (set (s/re-split #"\n" (slurp "data/sources/stopwords.txt"))))
+  (set (s/re-split #"\n" (slurp "doc/stopwords.txt"))))
 
 (defn to-lower-case [token-string]
   (.toLowerCase token-string))

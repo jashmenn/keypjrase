@@ -33,7 +33,8 @@
   (map (fn [f] (do
          (println (str "processing " f))
          (str (.toString f) "\t "(process-fn f) "\n")))
-       (filter #(re-find #".html$" (.toString %)) 
+       (filter #(and (re-find #".html$" (.toString %))
+                     (.isFile %)) 
                (file-seq (File. dir)))))
 
 (defn write-lines [file-name lines]
