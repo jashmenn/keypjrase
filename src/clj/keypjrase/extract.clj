@@ -188,7 +188,26 @@
 
 (defn highest-predictions-overall [preds]
   (top-n-predicted preds 100))
-(defn highest-predictions-average [preds])
+(defn highest-predictions-average-prep [preds]
+  (reduce (fn [acc p]
+            (let [token (:token p)
+                  orig-count (or (:count (acc token)) 0)
+                  orig-prob  (or (:prob  (acc token)) 0)
+                  orig-tfidf (or (:tfidf (acc token)) 0)]
+                (assoc acc token 
+                       {:count (+ orig-count 1)
+                        :prob  (+ orig-prob (:predicted-probability p))
+                        :tfidf (+ orig-tfidf (:tfidf (:features p)))}))) 
+          {} preds))
+(defn highest-predictions-average [preds]
+  (let [summed (highest-predictions-average-prep preds)]
+    (reduce (fn [acc [token sums]]
+              (let [c (:count sums)]
+                (concat acc [{:token token
+                              :predicted-probability (/ (:prob sums) c)
+                              :features {:tfidf (/ (:tfidf sums) c)}}]))) 
+            () summed)))
+
 
 (defn prediction-to-string [p]
   (su/join "\t" [(:token p) (:predicted-probability p) ((p :features) :tfidf)]))
@@ -209,9 +228,11 @@
   (def preds (group-predictions-by 2 fake-predictions))
   (def gpre (group-predictions (group-predictions-by 2 fake-predictions)))
   (highest-predictions-overall (gpre "foo/a"))
+  (highest-predictions-average (gpre "foo/a"))
 
   (println (pretty-print-predictions (highest-predictions-overall (gpre "foo/a"))))
 
+  (println (pretty-print-predictions (highest-predictions-average (gpre "foo/a"))))
   
 
   (defn -extract2
